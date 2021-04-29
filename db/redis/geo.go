@@ -9,6 +9,8 @@ package redis
 
 import (
 	"context"
+	"github.com/ckhero/go-common/errors"
+	"github.com/ckhero/go-common/util/json"
 	"github.com/go-redis/redis/v8"
 	xerrors "github.com/pkg/errors"
 	"strconv"
@@ -51,10 +53,10 @@ func GeoAdd(ctx context.Context, key string, geoLocation ...*GeoLocation) error 
 func GeoRadius(ctx context.Context, key string, lng, lat float64, query *GeoRadiusQuery) ([]*GeoLocation, error) {
 	key = buildKey(key)
 	query01 := &redis.GeoRadiusQuery{}
-	_ = util.DeepCopy(query, query01)
+	_ = json.DeepCopy(query, query01)
 	res, err := GetGlobalRedisClient().GeoRadius(ctx, key, lng, lat, query01).Result()
 	if err == redis.Nil {
-		return []*GeoLocation{}, errors_v2.NotFound("geo not exists!", "key [%s]", key)
+		return []*GeoLocation{}, errors.NotFound("geo not exists!", "key [%s]", key)
 	}
 	if err != nil {
 		return []*GeoLocation{}, xerrors.Wrapf(err, "key [%s]", key)
@@ -65,10 +67,10 @@ func GeoRadius(ctx context.Context, key string, lng, lat float64, query *GeoRadi
 func GeoRadiusUint64(ctx context.Context, key string, lng, lat float64, query *GeoRadiusQuery) ([]*GeoLocation, error) {
 	key = buildKey(key)
 	query01 := &redis.GeoRadiusQuery{}
-	_ = util.DeepCopy(query, query01)
+	_ = json.DeepCopy(query, query01)
 	res, err := GetGlobalRedisClient().GeoRadius(ctx, key, lng, lat, query01).Result()
 	if err == redis.Nil {
-		return []*GeoLocation{}, errors_v2.NotFound("geo not exists!", "key [%s]", key)
+		return []*GeoLocation{}, errors.NotFound("geo not exists!", "key [%s]", key)
 	}
 	if err != nil {
 		return []*GeoLocation{}, xerrors.Wrapf(err, "key [%s]", key)

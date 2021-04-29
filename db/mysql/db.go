@@ -4,11 +4,11 @@ import (
 
 	"errors"
 	"fmt"
+	"github.com/ckhero/go-common/config"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 	"time"
-	"youmi-micro-cluster/src/common/config"
 )
 
 type DBMap map[string]*gorm.DB

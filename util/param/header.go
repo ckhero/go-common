@@ -8,15 +8,15 @@
 package param
 
 import (
+	headerConst "github.com/ckhero/go-common/constant/header"
 	"github.com/gin-gonic/gin"
-	"youmi-micro-cluster/src/common/constant"
 )
 
 func GetToken(c *gin.Context) string {
 
-	token := c.GetHeader(constant.HeadAuthorization)
+	token := c.GetHeader(headerConst.HeaderToken)
 	if len(token) == 0 {
-		token = c.Query(constant.HeadAuthorization)
+		token = c.Query(headerConst.HeaderToken)
 	}
 	return token
 }

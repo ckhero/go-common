@@ -8,8 +8,8 @@
 package plugin
 
 import (
-	"youmi-micro-cluster/src/common/config"
-	"youmi-micro-cluster/src/common/logger"
+	"github.com/ckhero/go-common/config"
+	"github.com/ckhero/go-common/logger"
 )
 
 type Logger struct {
@@ -21,7 +21,7 @@ func NewPluginLogger() *Logger {
 }
 
 func (r *Logger) InitPlugin() error {
-	appConfig := config.AppConfig
+	appConfig := config.GetGlobalCfg()
 	logger.InitLogger(appConfig.Project, appConfig.Application, appConfig.Logger)
 	return nil
 }

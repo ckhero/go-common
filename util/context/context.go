@@ -9,25 +9,19 @@ package context
 
 import (
 	"context"
+	sysConst "github.com/ckhero/go-common/constant/sys"
 	"github.com/gin-gonic/gin"
-	"youmi-micro-cluster/src/common/constant"
-	ginUtil "youmi-micro-cluster/src/common/gin"
 )
 
 // ContextWithSpan 返回context
 func ContextWithSpan(c *gin.Context) (ctx context.Context, ok bool) {
 
-	v, exist := c.Get(constant.SysContextTracerKey)
+	v, exist := c.Get(sysConst.SysContextTracerKey)
 	if !exist {
 		ctx, ok = context.TODO(), false
 		return
 	}
 	ctx, ok = v.(context.Context)
-	ctx = context.WithValue(ctx, constant.HeadShopId, ginUtil.GetShopIdFromGin(c))
 	return
-}
-
-func GetShopIdFromCtx(ctx context.Context) uint64 {
-	return ctx.Value(constant.HeadShopId).(uint64)
 }
 
