@@ -16,7 +16,6 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"runtime/debug"
-	"youmi-micro-cluster/src/common/logger"
 )
 
 var DefaultMiddlewareOpts = []grpc.ServerOption{
@@ -41,9 +40,9 @@ func RecoveryInterceptorMiddleware(ctx context.Context, req interface{}, info *g
 }
 
 func LoggerMiddleware(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (resp interface{}, err error) {
-	logger.GetLogger(ctx).WithField("req", req).WithField("method", info).Info("request ! ")
+	//logger.GetLogger(ctx).WithField("req", req).WithField("method", info).Info("request ! ")
 	resp, err = handler(ctx, req)
-	logger.GetLoggerWithBody(ctx, resp).Info("response")
+	//logger.GetLoggerWithBody(ctx, resp).Info("response")
 	return
 }
 

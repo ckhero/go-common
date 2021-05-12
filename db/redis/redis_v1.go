@@ -73,3 +73,7 @@ func setPrefix(p string) {
 func getPrefix() string {
 	return prefix
 }
+
+func LazyRedisClient() func() *redis.Client {
+	return GetGlobalRedisClient
+}

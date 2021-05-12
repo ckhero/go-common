@@ -1,7 +1,7 @@
 package mysql
 
 import (
-
+	"context"
 	"errors"
 	"fmt"
 	"github.com/ckhero/go-common/config"
@@ -26,6 +26,17 @@ func getDB(name ...string) *gorm.DB {
 		key = name[0]
 	}
 	return dbMap[key]
+}
+
+func getDefaultDB(ctx context.Context) *gorm.DB {
+	key := "default"
+	db := getDB(key)
+	db = SetSpanToGorm(ctx, db)
+	return db
+}
+
+func LazyGetDefaultDB() func(ctx context.Context) *gorm.DB {
+	return getDefaultDB
 }
 
 /**
