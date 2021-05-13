@@ -26,6 +26,7 @@ func Run(errc chan error, rr RegisterRouter, rv RegisterValidator) {
 	engine := gin.New()
 	engine.Use(
 		ginCommon.TraceMiddleware(),
+		ginCommon.LoggerMiddleware(),
 		)
 	//注册顺序很重要，勿轻易调整，跨域请求已经转移到nginx层处理，此处不再处理cors
 	rr(engine)

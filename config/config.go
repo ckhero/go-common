@@ -28,21 +28,9 @@ type Config struct {
 	Domain      map[string]string   `yaml:"domain"`
 	Logger      Logger              `yaml:"logger"`
 	Plugins     []string            `yaml:"plugins"`
-	WeixinPay   WeixinPay           `yaml:"weixinPay"`
-}
-
-type WeixinPay struct {
-	MchId     string `yaml:"mchId"`
-	ApiKey    string `yaml:"apiKey"`
-	IsProd    bool   `yaml:"isProd"`
-	NotifyUrl string `yaml:"notifyUrl"`
-	AppIdMini string `yaml:"appIdMini"`
-	AppIdApp  string `yaml:"appIdApp"`
-
-	// 3个证书路径
-	CertPem string `yaml:"certPem"`
-	KeyPem  string `yaml:"keyPem"`
-	CertP12 string `yaml:"certP12"`
+	WeixinPay   *WeixinPay          `yaml:"weixinPay"`
+	Weixin      *Weixin             `yaml:"weixin"`
+	Auth        *Auth               `yaml:"auth"`
 }
 
 type ServerInfo struct {
