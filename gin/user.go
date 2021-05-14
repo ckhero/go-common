@@ -8,6 +8,7 @@
 package gin
 
 import (
+	"fmt"
 	"github.com/ckhero/go-common/auth"
 	"github.com/ckhero/go-common/constant/sys"
 	"github.com/ckhero/go-common/errors"
@@ -23,7 +24,12 @@ func UserJwtAuthMiddleware(secretKey string) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		ctx, _ := context.ContextWithSpan(c)
 		token := param.GetToken(c)
+		fmt.Println("token", token)
+
 		userId, data, err := auth.ResolveJWTToken(token, secretKey, logger.GetLogger(ctx))
+		fmt.Println("userId", userId)
+		fmt.Println("data", data)
+
 		c.Set(sys.SysKeyUserId, userId)
 		openId, ok := data["openId"]
 		if !ok || openId == "" || userId == 0 {
