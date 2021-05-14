@@ -23,3 +23,9 @@ const (
 const (
 	SysResponseDataKey = "RspKey"
 )
+
+const (
+	SysKeyUserId = "userId"
+	SysKeyOpenId = "opendId"
+)
+

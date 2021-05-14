@@ -25,7 +25,8 @@ require (
 	github.com/thoas/go-funk v0.8.0
 	github.com/uber/jaeger-client-go v2.27.0+incompatible
 	github.com/uber/jaeger-lib v2.4.1+incompatible // indirect
-	google.golang.org/grpc v1.26.0
+	google.golang.org/genproto v0.0.0-20210510173355-fb37daa5cd7a // indirect
+	google.golang.org/grpc v1.36.1
 	gorm.io/driver/mysql v1.0.6
 	gorm.io/gorm v1.21.9
 )

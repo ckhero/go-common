@@ -1,90 +1,136 @@
-/**
- *@Description
- *@ClassName errors
- *@Date 2021/3/12 下午1:10
- *@Author ckhero
- */
-
 package errors
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/go-kit/kit/sd/lb"
+
+	"google.golang.org/genproto/googleapis/rpc/errdetails"
+	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
 
-type StatusError struct {
-	Code int32  `json:"code"`
-	Msg  string `json:"msg"`
-	Reason  string `json:"reason"`
+const (
+	// SupportPackageIsVersion1 this constant should not be referenced by any other code.
+	SupportPackageIsVersion1 = true
+)
+
+// Error is describes the cause of the error with structured details.
+// For more details see https://github.com/googleapis/googleapis/blob/master/google/rpc/error_details.proto.
+type Error struct {
+	s *status.Status
+
+	Domain   string            `json:"domain"`
+	Reason   string            `json:"reason"`
+	Metadata map[string]string `json:"metadata"`
 }
 
-type StatusError2 struct {
-	Code int32  `json:"code"`
+func (e *Error) Error() string {
+	return fmt.Sprintf("error: domain = %s reason = %s metadata = %v", e.Domain, e.Reason, e.Metadata)
 }
 
+// GRPCStatus returns the Status represented by se.
+func (e *Error) GRPCStatus() *status.Status {
+	s, err := e.s.WithDetails(&errdetails.ErrorInfo{
+		Domain:   e.Domain,
+		Reason:   e.Reason,
+		Metadata: e.Metadata,
+	})
+	if err != nil {
+		return e.s
+	}
+	return s
+}
 
-func (e *StatusError) Is(target error) bool {
-	err, ok := target.(*StatusError)
-	if ok {
-		return e.Code == err.Code
+// Is matches each error in the chain with the target value.
+func (e *Error) Is(err error) bool {
+	if target := new(Error); errors.As(err, &target) {
+		return target.Domain == e.Domain && target.Reason == e.Reason
 	}
 	return false
 }
 
-func (e *StatusError) Error() string {
-	data, err := json.Marshal(e)
-	if err != nil {
-		panic(err)
-	}
-	return string(data)
-	//return fmt.Sprintf("error: code = %d msg = %s reason + %s", e.Code, e.Msg, e.Reason)
+// WithMetadata with an MD formed by the mapping of key, value.
+func (e *Error) WithMetadata(md map[string]string) *Error {
+	err := *e
+	err.Metadata = md
+	return &err
 }
 
-func Error(code int32, reason, msg string) error {
-	return &StatusError{
-		Code: code,
-		Msg:  msg,
+// New returns an error object for the code, message.
+func New(code codes.Code, domain, reason, message string) *Error {
+	return &Error{
+		s:      status.New(code, message),
+		Domain: domain,
 		Reason: reason,
 	}
 }
 
-func Errorf(code int32, reason, format string, a ...interface{}) error {
-	return Error(code, reason, fmt.Sprintf(format, a...))
+// Newf New(code fmt.Sprintf(format, a...))
+func Newf(code codes.Code, domain, reason, format string, a ...interface{}) *Error {
+	return New(code, domain, reason, fmt.Sprintf(format, a...))
 }
 
-func Code(err error) int32 {
+// Errorf returns an error object for the code, message and error info.
+func Errorf(code codes.Code, domain, reason, format string, a ...interface{}) error {
+	return &Error{
+		s:      status.New(code, fmt.Sprintf(format, a...)),
+		Domain: domain,
+		Reason: reason,
+	}
+}
+
+// Code returns the code for a particular error.
+// It supports wrapped errors.
+func Code(err error) codes.Code {
 	if err == nil {
-		return 0 // ok
+		return codes.OK
 	}
-	if se := new(StatusError); errors.As(err, &se) {
-		return se.Code
+	if se := FromError(err); err != nil {
+		return se.s.Code()
 	}
-	return 2 // unknown
+	return codes.Unknown
 }
 
-func As(err error, target interface{}) bool {
-	switch err.(type) {
-	case lb.RetryError:
-		err = err.(lb.RetryError).Final
-		if ee, ok := status.FromError(err.(error)); ok {
-			tmp :=ParseError(ee.Message())
-			if tmp != nil {
-				err = tmp
-			}
-		} else {
-		}
+// Domain returns the domain for a particular error.
+// It supports wrapped errors.
+func Domain(err error) string {
+	if se := FromError(err); err != nil {
+		return se.Domain
 	}
-	return errors.As(err, target)
+	return ""
 }
 
-func ParseError(data string) *StatusError {
-	var terr StatusError
-	err := json.Unmarshal([]byte(data), &terr)
-	if err != nil {
+// Reason returns the reason for a particular error.
+// It supports wrapped errors.
+func Reason(err error) string {
+	if se := FromError(err); err != nil {
+		return se.Reason
+	}
+	return ""
+}
+
+// FromError try to convert an error to *Error.
+// It supports wrapped errors.
+func FromError(err error) *Error {
+	if err == nil {
 		return nil
 	}
-	return &terr
+	if target := new(Error); errors.As(err, &target) {
+		return target
+	}
+	gs, ok := status.FromError(err)
+	if ok {
+		for _, detail := range gs.Details() {
+			switch d := detail.(type) {
+			case *errdetails.ErrorInfo:
+				return New(
+					gs.Code(),
+					d.Domain,
+					d.Reason,
+					gs.Message(),
+				).WithMetadata(d.Metadata)
+			}
+		}
+	}
+	return New(gs.Code(), "", "", err.Error())
 }
