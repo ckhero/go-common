@@ -44,7 +44,7 @@ func NewMiniClient() (*miniprogram.MiniProgram) {
 		miniClient = miniprogram.NewMiniProgram(&miniCfg.Config{
 			AppID: cfg.AppId,
 			AppSecret: cfg.SecretKey,
-			Cache: &wechatCache.Memory{},
+			Cache: wechatCache.NewMemory(),
 		})
 	})
 
