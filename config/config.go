@@ -17,20 +17,21 @@ import (
 )
 
 type Config struct {
-	Project     string              `yaml:"project"`
-	Application string              `yaml:"application"`
-	Env         string              `yaml:"env"`
-	Debug       ServerInfo          `yaml:"debug"`
-	HTTP        ServerInfo          `yaml:"http"`
-	GRPC        ServerInfo          `yaml:"grpc"`
-	Database    map[string]Database `yaml:"database"`
-	Redis       map[string]Redis    `yaml:"redis"`
-	Domain      map[string]string   `yaml:"domain"`
-	Logger      Logger              `yaml:"logger"`
-	Plugins     []string            `yaml:"plugins"`
-	WeixinPay   *WeixinPay          `yaml:"weixinPay"`
-	Weixin      *Weixin             `yaml:"weixin"`
-	Auth        *Auth               `yaml:"auth"`
+	Project        string              `yaml:"project"`
+	Application    string              `yaml:"application"`
+	Env            string              `yaml:"env"`
+	Debug          ServerInfo          `yaml:"debug"`
+	HTTP           ServerInfo          `yaml:"http"`
+	GRPC           ServerInfo          `yaml:"grpc"`
+	Database       map[string]Database `yaml:"database"`
+	Redis          map[string]Redis    `yaml:"redis"`
+	Domain         map[string]string   `yaml:"domain"`
+	Logger         Logger              `yaml:"logger"`
+	Plugins        []string            `yaml:"plugins"`
+	WeixinPay      *WeixinPay          `yaml:"weixinPay"`
+	Weixin         *Weixin             `yaml:"weixin"`
+	Auth           *Auth               `yaml:"auth"`
+	RedPacketLimit *RedPacketLimit     `yaml:"redPacketLimit"`
 }
 
 type ServerInfo struct {
